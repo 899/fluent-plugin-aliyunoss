@@ -72,7 +72,6 @@ module Fluent
 					File::symlink(chunk_path, fake_path)
 
 					command = "java -jar /orc-tools.jar convert -o #{output_path} #{fake_path}"
-					log.debug "cmd: #{command}"
 					res = system command
 					unless res
 						raise "failed to execute java -jar /orc-tools.jar command. status = #{$?}"
@@ -130,10 +129,10 @@ module Fluent
 			def write(chunk)
 				begin
 					f = Tempfile.new('oss-')
+					output_path = f.path
 					compress(chunk, f)
 					path = process_object_key_format(chunk, "#{@oss_path}.#{@store_as}")
-					log.debug "output_path: #{f.path} oss_path: #{path}"
-					raise "Upload #{f.path} failed" unless @bucket.resumable_upload(path, f.path)
+					raise "Upload #{output_path} failed" unless @bucket.resumable_upload(path, output_path)
 				ensure
 					f.close(true)
 				end
