@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.authors = ["junjie"]
   spec.email   = ["junjzh0205@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = "Aliyun OSS output plugin for Fluentd event collector"
+  spec.summary       = spec.description
+  spec.homepage      = "https://github.com/899/fluent-plugin-aliyunoss"
   spec.license       = "Apache-2.0"
 
   test_files, files  = `git ls-files -z`.split("\x0").partition do |f|

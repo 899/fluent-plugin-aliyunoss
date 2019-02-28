@@ -131,7 +131,7 @@ module Fluent
 				begin
 					f = Tempfile.new('oss-')
 					compress(chunk, f)
-					path = process_object_key_format(chunk, "#{@oss_path}.#{{@store_as}})
+					path = process_object_key_format(chunk, "#{@oss_path}.#{@store_as}")
 					log.debug "output_path: #{f.path} oss_path: #{path}"
 					raise "Upload #{f.path} failed" unless @bucket.resumable_upload(path, f.path)
 				ensure
