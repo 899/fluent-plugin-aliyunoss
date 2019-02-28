@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name    = "fluent-plugin-aliyunoss"
-  spec.version = "0.2.1"
+  spec.version = "0.2.2"
   spec.authors = ["junjie"]
   spec.email   = ["junjzh0205@gmail.com"]
 
@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "test-unit", "~> 3.0"
   spec.add_runtime_dependency "fluentd", [">= 0.14.10", "< 2"]
+  spec.add_dependency "aliyun-sdk", [">= 0.6.0"]
 end
