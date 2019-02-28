@@ -23,11 +23,11 @@ require 'securerandom'
 require 'socket'
 
 module Fluent
-  module Plugin
-    class AliyunossOutput < Fluent::Plugin::Output
-      Fluent::Plugin.register_output("aliyunoss", self)
+	module Plugin
+		class AliyunossOutput < Fluent::Plugin::Output
+			Fluent::Plugin.register_output("aliyunoss", self)
 
-      helpers :formatter, :inject, :compat_parameters
+			helpers :formatter, :inject, :compat_parameters
 
 			DEFAULT_FORMAT_TYPE = "out_file"
 			DEFAULT_TIMEKEY = 60 * 60 * 24
@@ -41,7 +41,9 @@ module Fluent
 			desc "OSS endpoint"
 			config_param :oss_endpoint, :string
 			desc "The format of OSS object keys path"
-			config_param :oss_path, :string, default: "${tag}/date=%Y-%m-%d/%{host}-worker#{ENV['SERVERENGINE_WORKER_ID']}-%{uuid}-%Y%m%d%H%M%S.gz"
+			config_param :oss_path, :string, default: "${tag}/date=%Y-%m-%d/%{host}-worker#{ENV['SERVERENGINE_WORKER_ID']}-%{uuid}-%Y%m%d%H%M%S"
+			desc "Archive format on OSS"
+			config_param :store_as, :string, default: "gz"
 
 			config_section :format do
 				config_set_default :@type, DEFAULT_FORMAT_TYPE
@@ -60,16 +62,34 @@ module Fluent
 			end
 
 			def compress(chunk, tmp)
-				res = system "gzip -c #{chunk.path} > #{tmp.path}"
-				unless res
-					log.warn "failed to execute gzip command. Fallback to GzipWriter. status = #{$?}"
-					begin
-						tmp.truncate(0)
-						gw = Zlib::GzipWriter.new(tmp)
-						chunk.write_to(gw)
-						gw.close
-					ensure
-						gw.close rescue nil
+				if @store_as == "orc"
+					# We just need a tmp file path, orc-tools convert won't work if file exists
+					output_path = tmp.path
+					tmp.delete
+					# Create a symlink with .json suffix, to fool orc-tools
+					chunk_path = File::realpath(chunk.path)
+					fake_path = "#{chunk_path}.json"
+					File::symlink(chunk_path, fake_path)
+
+					command = "orc-tools convert -o #{output_path} #{fake_path}"
+					log.debug "cmd: #{command}"
+					res = system command
+					unless res
+						raise "failed to execute java -jar /orc-tools.jar command. status = #{$?}"
+					end
+					File::unlink(fake_path)
+				else
+					res = system "gzip -c #{chunk.path} > #{tmp.path}"
+					unless res
+						log.warn "failed to execute gzip command. Fallback to GzipWriter. status = #{$?}"
+						begin
+							tmp.truncate(0)
+							gw = Zlib::GzipWriter.new(tmp)
+							chunk.write_to(gw)
+							gw.close
+						ensure
+							gw.close rescue nil
+						end
 					end
 				end
 			end
@@ -111,12 +131,13 @@ module Fluent
 				begin
 					f = Tempfile.new('oss-')
 					compress(chunk, f)
-					path = process_object_key_format(chunk, @oss_path)
+					path = process_object_key_format(chunk, "#{@oss_path}.#{{@store_as}})
+					log.debug "output_path: #{f.path} oss_path: #{path}"
 					raise "Upload #{f.path} failed" unless @bucket.resumable_upload(path, f.path)
 				ensure
 					f.close(true)
 				end
 			end
-	   end
-  end
+		end
+	end
 end
