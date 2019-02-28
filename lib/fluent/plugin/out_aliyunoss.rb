@@ -14,6 +14,13 @@
 # limitations under the License.
 
 require "fluent/plugin/output"
+require 'fluent/log'
+require 'aliyun/oss'
+require 'zlib'
+require 'time'
+require 'tempfile'
+require 'securerandom'
+require 'socket'
 
 module Fluent
   module Plugin
