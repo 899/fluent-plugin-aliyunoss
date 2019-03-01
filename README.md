@@ -81,12 +81,16 @@ ex:
 
 **If you want to use the storage format of orc, you need to install and configure some tools..**
 
-``` in alpine3.8
+``` 
+in alpine3.8
+
 apk add -U openjdk8-jre
 wget https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.5.4/orc-tools-1.5.4-uber.jar -O /orc-tools.jar
 ```
 
-```  vi /log4j.properties
+```  
+vi /log4j.properties
+
 log4j.rootLogger=FATAL,stdout
 log4j.appender.stdout=org.apache.log4j.ConsoleAppender
 log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
