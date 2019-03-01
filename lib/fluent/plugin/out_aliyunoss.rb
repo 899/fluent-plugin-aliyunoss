@@ -71,7 +71,7 @@ module Fluent
 					fake_path = "#{chunk_path}.json"
 					File::symlink(chunk_path, fake_path)
 
-					command = "java -jar /orc-tools.jar convert -o #{output_path} #{fake_path}"
+					command = "java -Dlog4j.configuration=file:/log4j.properties -jar /orc-tools.jar convert -o #{output_path} #{fake_path}"
 					res = system command
 					unless res
 						raise "failed to execute java -jar /orc-tools.jar command. status = #{$?}"
