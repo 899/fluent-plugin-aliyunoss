@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name    = "fluent-plugin-aliyunoss"
-  spec.version = "0.2.4"
+  spec.version = "0.2.5"
   spec.authors = ["junjie"]
   spec.email   = ["junjzh0205@gmail.com"]
 
