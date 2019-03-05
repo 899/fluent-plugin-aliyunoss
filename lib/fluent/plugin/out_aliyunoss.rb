@@ -69,6 +69,9 @@ module Fluent
 					# Create a symlink with .json suffix, to fool orc-tools
 					chunk_path = File::realpath(chunk.path)
 					fake_path = "#{chunk_path}.json"
+					if File::exists?(fake_path)
+						File::unlink(fake_path)
+					end
 					File::symlink(chunk_path, fake_path)
 
 					command = "java -Dlog4j.configuration=file:/log4j.properties -jar /orc-tools.jar convert -o #{output_path} #{fake_path}"
