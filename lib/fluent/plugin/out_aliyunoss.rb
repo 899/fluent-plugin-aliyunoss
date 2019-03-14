@@ -105,6 +105,10 @@ module Fluent
 				key_map.each do |k, v|
 					result = result.gsub("%{#{k.to_s}}", v)
 				end
+				# support replace tag_parts
+				chunk.metadata.tag.split('.').each_with_index do |t, idx|
+					result = result.gsub("${tag_parts[#{idx}]}", t)
+				end
 				extract_placeholders(result, chunk.metadata)
 			end
 
